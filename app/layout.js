@@ -28,13 +28,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        <Navbar />
-        <SpeedInsights />
-        <ScrollToTop />
-        <Whatsapp />
-        <ChatBot />
-        <VoiceControl />
-        <Footer />
+        
         </body>
       </html>
   );
