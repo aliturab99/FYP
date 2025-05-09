@@ -30,7 +30,6 @@ export default function RootLayout({ children }) {
         >
         <Navbar />
         <SpeedInsights />
-        {children}
         <ScrollToTop />
         <Whatsapp />
         <ChatBot />
