@@ -7,6 +7,8 @@ import ChatBot from "./components/ChatBot";
 import Whatsapp from "./components/Whatsapp";
 import VoiceControl from "./components/Voice";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import DownTime from "./components/DownTime";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,7 +30,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        
+        <DownTime />
         </body>
       </html>
   );
