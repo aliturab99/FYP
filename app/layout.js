@@ -37,13 +37,15 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-           <header className="flex justify-end items-center p-4 gap-4 h-16">
+           <header className="flex justify-end items-center p-4 gap-4 h-16 text-white">
             <SignedOut>
               <SignInButton />
               <SignUpButton />
             </SignedOut>
             <SignedIn>
-              <UserButton showName/>
+              <div className="bg-white rounded-lg">
+              <UserButton showName />
+              </div>
             </SignedIn>
           </header>
         <Navbar />
