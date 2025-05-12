@@ -7,8 +7,14 @@ import ChatBot from "./components/ChatBot";
 import Whatsapp from "./components/Whatsapp";
 import VoiceControl from "./components/Voice";
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import DownTime from "./components/DownTime";
-
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,12 +32,30 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
+    <ClerkProvider>
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        <DownTime />
+           <header className="flex justify-end items-center p-4 gap-4 h-16">
+            <SignedOut>
+              <SignInButton />
+              <SignUpButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton showName/>
+            </SignedIn>
+          </header>
+        <Navbar />
+        {children}
+        <Whatsapp />
+        <VoiceControl />
+        <ChatBot />
+        <Footer />
+        <SpeedInsights />
+        <ScrollToTop />
         </body>
       </html>
+      </ClerkProvider>
   );
 }
