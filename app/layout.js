@@ -51,11 +51,11 @@ export default function RootLayout({ children }) {
         <Navbar />
         {children}
         <Whatsapp />
+        <ScrollToTop />
         <VoiceControl />
         <ChatBot />
         <Footer />
         <SpeedInsights />
-        <ScrollToTop />
         </body>
       </html>
       </ClerkProvider>
