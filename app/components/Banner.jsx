@@ -11,7 +11,7 @@ const fonda = Fondamento({
 
 const Banner = () => {
   return (
-    <div className='relative w-full h-[100dvh] bg-gradient-to-br from-gray-900 via-[#1a1a1a] to-gray-800 overflow-hidden'>
+    <section className='relative w-full h-[100dvh] bg-gradient-to-br from-gray-900 via-[#1a1a1a] to-gray-800 overflow-hidden'>
       {/* Dark-themed background elements */}
       <div className='absolute inset-0 opacity-20'>
         <div className='absolute top-20 left-20 w-40 h-40 rounded-full bg-emerald-900 filter blur-3xl'></div>
@@ -71,7 +71,7 @@ const Banner = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 
