@@ -4,7 +4,7 @@ import { streamText } from 'ai';
 
 export const maxDuration = 30; // Vercel-specific for streaming
 
-export async function POST(req) {
+export async function GET(req) {
   const { messages } = await req.json();
 
   const result = await streamText({
