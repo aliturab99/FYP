@@ -29,8 +29,8 @@ const AdviceButton = () => {
       </button>
       {advice && (
         <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc' }}>
-          <h3>Medical Advice:</h3>
-          <p>{advice}</p>
+          <h3 className='text-white'>Medical Advice:</h3>
+          <p className='text-white'>{advice}</p>
         </div>
       )}
       {error && <p style={{ color: 'red' }}>{error}</p>}
