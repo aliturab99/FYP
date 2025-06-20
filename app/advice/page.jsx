@@ -1,24 +1,41 @@
+"use client"; // Marks this as a client component
 
-import React from 'react'
-import { openai } from "@ai-sdk/openai"
-import { generateText } from "ai"
-const page = () => {
-  const main = async () => {
-    const { text } = await generateText({
-      model: openai("o3-mini"),
-      prompt: "Give a medical advice of how a person can keep themselves fit"
-    })
-    document.writeln(text)
-  }
-  main()
+import React, { useState } from 'react';
+import { getMedicalAdvice } from '@/app/actions'; // Import your server action
+
+const AdviceButton = () => {
+  const [advice, setAdvice] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleClick = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const medicalAdvice = await getMedicalAdvice();
+      setAdvice(medicalAdvice);
+    } catch (err) {
+      console.error("Client-side error calling server action:", err);
+      setError("Failed to fetch advice.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <>
-    <div className='border-4 border-black'>
-      "use client"
-      <button onClick={main}>Click me to get an advice</button>
+    <div>
+      <button onClick={handleClick} disabled={loading}>
+        {loading ? 'Getting Advice...' : 'Click me to get an advice'}
+      </button>
+      {advice && (
+        <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc' }}>
+          <h3>Medical Advice:</h3>
+          <p>{advice}</p>
+        </div>
+      )}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
-    </>
-  )
-}
+  );
+};
 
-export default page
+export default AdviceButton;
