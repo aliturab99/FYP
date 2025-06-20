@@ -6,7 +6,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import ChatBot from "./components/ChatBot";
 import Whatsapp from "./components/Whatsapp";
 import VoiceControl from "./components/Voice";
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import {
   ClerkProvider,
   SignInButton,
@@ -55,7 +54,6 @@ export default function RootLayout({ children }) {
         <VoiceControl />
         <ChatBot />
         <Footer />
-        <SpeedInsights />
         </body>
       </html>
       </ClerkProvider>
