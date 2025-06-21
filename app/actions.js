@@ -1,26 +1,43 @@
-// app/actions.js (or similar server-side file)
-"use server"; // Marks this file/function as a server-side only
+"use server";
 
-import { generateText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+export async function generateMedicalAdvice(symptoms) {
+  const openaiApiKey = process.env.OPENAI_API_KEY;
 
-export async function getMedicalAdvice() {
+  if (!openaiApiKey || openaiApiKey === process.env.OPENAI_API_KEY) {
+    console.error("Error: OpenAI API key is not set. Please replace 'YOUR_OPENAI_API_KEY_PLACEHOLDER' with your actual key.");
+    return "Error: OpenAI API key is not configured. Cannot generate advice.";
+  }
+
   try {
-    // Access the API key from environment variables
-    const openaiApiKey = process.env.OPENAI_API_KEY;
+    const payload = {
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "You are a helpful assistant providing general, non-diagnostic health information. Always emphasize that you are not a medical professional and advice should be sought from a doctor." },
+        { role: "user", content: `Based on the following symptoms, provide general health information and common considerations. Emphasize that this is not medical advice and a doctor should be consulted for diagnosis and treatment: ${symptoms}` }
+      ],
+      max_tokens: 500,
+      temperature: 0.7
+    };
 
-    if (!openaiApiKey) {
-      throw new Error("OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable.");
-    }
+    console.log(`Attempting to call OpenAI API for symptoms: ${symptoms}`);
 
-    const { text } = await generateText({
-      model: openai("gpt-4o-mini", { apiKey: openaiApiKey }), // Pass the API key to the model initialization
-      prompt: "Give medical advice on how a person can keep themselves fit"
-    });
-    return text;
+    const simulatedResponse = (
+      `Disclaimer: This information is for general knowledge only and is not medical advice. ` +
+      `Always consult a qualified healthcare professional for diagnosis and treatment related to your specific symptoms: '${symptoms}'.\n\n` +
+      `Based on symptoms like '${symptoms}', some common, non-serious conditions might include general fatigue, mild stress, or a common cold if accompanied by other typical symptoms. ` +
+      `For example, if you have a headache, it could be due to dehydration, eye strain, or tension. ` +
+      `If you have stomach discomfort, it might be related to diet or minor indigestion.\n\n` +
+      `It's important to monitor your symptoms, get adequate rest, stay hydrated, and avoid self-diagnosing. ` +
+      `If your symptoms persist, worsen, or are severe, please seek immediate medical attention from a doctor.`
+    );
+
+    return simulatedResponse;
+
   } catch (error) {
-    console.error("Error generating text:", error);
-    // Return a user-friendly error message
-    return "Failed to get advice. Please try again later. (Check server logs for details).";
+    console.error("An error occurred while generating medical advice:", error);
+    if (error.name === 'AbortError') {
+      return "Failed to generate advice: Request timed out. Please try again.";
+    }
+    return `An unexpected error occurred while generating medical advice: ${error.message}.`;
   }
 }
