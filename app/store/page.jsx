@@ -7,16 +7,6 @@ import axios from 'axios'
 import NoSSR from '../components/NoSSR'
 import { fetchCategories } from '../lib/categories'
 
-const categories = [
-  { id: 'all', name: 'All Products' },
-  { id: 'medications', name: 'Medications' },
-  { id: 'medical-supplies', name: 'Medical Supplies' },
-  { id: 'devices', name: 'Medical Devices' },
-  { id: 'first-aid', name: 'First Aid' },
-  { id: 'hygiene', name: 'Hygiene Products' },
-  { id: 'baby-care', name: 'Baby Care' }
-];
-
 const LoadingSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
     {[...Array(8)].map((_, i) => (
