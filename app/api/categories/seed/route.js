@@ -6,17 +6,28 @@ export async function POST() {
   try {
     await connectDB();
     
-    // Check if categories already exist
+    // Check if we have enough categories (less than 3 means we should add more)
     const existingCategories = await Category.find();
-    if (existingCategories.length > 0) {
+    if (existingCategories.length >= 3) {
       return new Response(JSON.stringify({ 
         message: 'Categories already exist', 
         count: existingCategories.length 
       }), { status: 200 });
     }
 
-    // Insert default categories
-    const categories = await Category.insertMany(DEFAULT_CATEGORIES.map(cat => ({
+    // Get existing category IDs to avoid duplicates
+    const existingIds = existingCategories.map(cat => cat.id);
+    const categoriesToAdd = DEFAULT_CATEGORIES.filter(cat => !existingIds.includes(cat.id));
+
+    if (categoriesToAdd.length === 0) {
+      return new Response(JSON.stringify({ 
+        message: 'All default categories already exist', 
+        count: existingCategories.length 
+      }), { status: 200 });
+    }
+
+    // Insert remaining default categories
+    const categories = await Category.insertMany(categoriesToAdd.map(cat => ({
       ...cat,
       description: `Default ${cat.name.toLowerCase()} category`,
       isActive: true
@@ -24,8 +35,9 @@ export async function POST() {
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: 'Default categories created', 
-      categories 
+      message: `Added ${categories.length} new categories`, 
+      categories,
+      total: existingCategories.length + categories.length
     }), { status: 201 });
     
   } catch (error) {
