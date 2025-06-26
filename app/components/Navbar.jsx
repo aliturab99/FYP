@@ -3,10 +3,22 @@
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useUser } from '@clerk/nextjs';
 
 const SimpleHamburgerNavbar = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const { user, isSignedIn } = useUser();
+
+  // Admin email check
+  const ADMIN_EMAILS = [
+    "syedyawaraliturab@gmail.com", // Replace with your actual admin email
+    // Add more admin emails as needed
+  ];
+  
+  const isAdmin = isSignedIn && user?.emailAddresses?.[0]?.emailAddress && 
+    (ADMIN_EMAILS.includes(user.emailAddresses[0].emailAddress) || 
+     user.emailAddresses[0].emailAddress.endsWith("@medmagic.com"));
 
   useEffect(() => {
     const handleResize = () => {
@@ -91,6 +103,13 @@ const SimpleHamburgerNavbar = () => {
                   Calculate BMI
                 </Link>
               </li>
+              {isAdmin && (
+                <li>
+                  <Link href="/admin" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    Admin
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/quiz" className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-colors">
                   Take Quiz
@@ -140,6 +159,13 @@ const SimpleHamburgerNavbar = () => {
                   Calculate BMI
                 </Link>
               </li>
+            {isAdmin && (
+              <li className="w-full text-center border-b border-gray-800 pb-2">
+                <Link href="/admin" className="block py-2 hover:text-purple-400 transition-colors" onClick={toggleMenu}>
+                  Admin Dashboard
+                </Link>
+              </li>
+            )}
             <li className="w-full text-center pt-2">
               <Link
                 href="/quiz"
