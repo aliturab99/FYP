@@ -26,7 +26,7 @@ const AdminDashboard = () => {
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('analytics'); // Default to analytics tab
   const [addProductForm, setAddProductForm] = useState({
     name: "",
     price: "",
@@ -290,26 +290,6 @@ const AdminDashboard = () => {
           {/* Tabs */}
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
             <div className="flex border-b border-white/10">
-              <button
-                onClick={() => setActiveTab('products')}
-                className={`px-6 py-4 font-medium transition-colors ${
-                  activeTab === 'products' 
-                    ? 'bg-emerald-600/20 text-emerald-400 border-b-2 border-emerald-400' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Products Management
-              </button>
-              <button
-                onClick={() => setActiveTab('add-product')}
-                className={`px-6 py-4 font-medium transition-colors ${
-                  activeTab === 'add-product' 
-                    ? 'bg-emerald-600/20 text-emerald-400 border-b-2 border-emerald-400' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Add Product
-              </button>
               <button
                 onClick={() => setActiveTab('analytics')}
                 className={`px-6 py-4 font-medium transition-colors ${
