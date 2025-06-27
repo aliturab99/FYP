@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import NoSSR from "../components/NoSSR";
 import { fetchCategories } from "../lib/categories";
+import apiClient from "../lib/api";
 
 // Admin email list - you can modify this to include your admin emails
 const ADMIN_EMAILS = [
@@ -59,29 +60,39 @@ const AdminDashboard = () => {
 
   const loadData = async () => {
     try {
-      const [categoriesData, productsRes] = await Promise.all([
+      const [categoriesData, adminStats] = await Promise.all([
         fetchCategories(),
-        fetch('/api/products')
+        apiClient.getAdminStats(userEmail).catch(() => null)
       ]);
       
       setCategories(categoriesData);
-      const productsData = await productsRes.json();
-      setProducts(productsData);
+      
+      // Use admin stats if available, otherwise fetch products directly
+      if (adminStats) {
+        setStats({
+          totalProducts: adminStats.overview.totalProducts,
+          totalCategories: adminStats.overview.totalCategories,
+          averagePrice: adminStats.overview.averagePrice || 0
+        });
+        setProducts(adminStats.recentProducts || []);
+      } else {
+        // Fallback to direct product fetch
+        const productsData = await apiClient.getProducts();
+        const products = productsData.products || productsData;
+        setProducts(products);
+        
+        const avgPrice = products.length > 0 ? products.reduce((sum, p) => sum + p.price, 0) / products.length : 0;
+        setStats({
+          totalProducts: products.length,
+          totalCategories: categoriesData.length,
+          averagePrice: avgPrice
+        });
+      }
       
       // Set default category for add form
       if (categoriesData.length > 0) {
         setAddProductForm(prev => ({ ...prev, category: categoriesData[0].id }));
       }
-      
-      // Calculate stats
-      const categoryCount = categoriesData.length;
-      const avgPrice = productsData.length > 0 ? productsData.reduce((sum, p) => sum + p.price, 0) / productsData.length : 0;
-      
-      setStats({
-        totalProducts: productsData.length,
-        totalCategories: categoryCount,
-        averagePrice: avgPrice
-      });
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -91,31 +102,27 @@ const AdminDashboard = () => {
 
   const deleteProduct = async (id) => {
     try {
-      const res = await fetch(`/api/products/${id}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
+      const result = await apiClient.deleteProduct(id);
+      if (result.success) {
         loadData();
         setDeleteConfirm(null);
       }
     } catch (error) {
       console.error('Error deleting product:', error);
+      alert('Error deleting product: ' + error.message);
     }
   };
 
   const updateProduct = async (id, updatedData) => {
     try {
-      const res = await fetch(`/api/products/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
-      });
-      if (res.ok) {
+      const result = await apiClient.updateProduct(id, updatedData);
+      if (result.success) {
         loadData();
         setEditingProduct(null);
       }
     } catch (error) {
       console.error('Error updating product:', error);
+      alert('Error updating product: ' + error.message);
     }
   };
 
@@ -123,12 +130,8 @@ const AdminDashboard = () => {
     e.preventDefault();
     setAddProductLoading(true);
     try {
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(addProductForm)
-      });
-      if (res.ok) {
+      const result = await apiClient.createProduct(addProductForm);
+      if (result.success) {
         setAddProductSuccess(true);
         setAddProductForm({ 
           name: "", 
@@ -142,6 +145,7 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error adding product:', error);
+      alert('Error adding product: ' + error.message);
     } finally {
       setAddProductLoading(false);
     }
@@ -333,30 +337,16 @@ const AdminDashboard = () => {
                           <div className="flex items-center space-x-4">
                             <div className="relative w-16 h-16 rounded-lg overflow-hidden">
                               <Image 
-                                src={product.image} 
-                                alt={product.name}
+                                src={product?.image} 
+                                alt={product?.name}
                                 fill
                                 className="object-cover"
                               />
                             </div>
                             <div>
-                              <h3 className="font-semibold text-lg">{product.name}</h3>
-                              <p className="text-gray-400">{product.category} • ${product.price.toFixed(2)}</p>
+                              <h3 className="font-semibold text-lg">{product?.name}</h3>
+                              <p className="text-gray-400">{product?.category} • ${product?.price.toFixed(2)}</p>
                             </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => setEditingProduct(product)}
-                              className="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => setDeleteConfirm(product._id)}
-                              className="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg transition-colors"
-                            >
-                              Delete
-                            </button>
                           </div>
                         </div>
                       ))}
