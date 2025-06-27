@@ -6,6 +6,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import ChatBot from "./components/ChatBot";
 import Whatsapp from "./components/Whatsapp";
 import VoiceControl from "./components/Voice";
+import ClientWrapper from "./components/ClientWrapper";
 import {
   ClerkProvider,
   SignInButton,
@@ -32,17 +33,20 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          suppressHydrationWarning={true}
         >
-        <Navbar />
-        {children}
-        <Whatsapp />
-        <ScrollToTop />
-        <VoiceControl />
-        <ChatBot />
-        <Footer />
+          <ClientWrapper>
+          <Navbar />
+          {children}
+          <Whatsapp />
+          <ScrollToTop />
+          <VoiceControl />
+          <ChatBot />
+          <Footer />
+          </ClientWrapper>
         </body>
       </html>
       </ClerkProvider>

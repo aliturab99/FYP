@@ -11,10 +11,23 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs';
+import { useUser } from "@clerk/nextjs";
+
 
 const SimpleHamburgerNavbar = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const { user, isSignedIn } = useUser();
+
+  // Admin email check
+  const ADMIN_EMAILS = [
+    "syedyawaraliturab@gmail.com", // Replace with your actual admin email
+    // Add more admin emails as needed
+  ];
+  
+  const isAdmin = isSignedIn && user?.emailAddresses?.[0]?.emailAddress && 
+    (ADMIN_EMAILS.includes(user.emailAddresses[0].emailAddress) || 
+     user.emailAddresses[0].emailAddress.endsWith("@medmagic.com"));
 
   useEffect(() => {
     const handleResize = () => {
@@ -67,6 +80,12 @@ const SimpleHamburgerNavbar = () => {
           </SignedOut>
           <SignedIn>
             <UserButton showName={false} afterSignOutUrl="/" />
+            {/* Admin Dashboard Button (visible only to admin) */}
+            {isAdmin && (
+              <Link href="/admin" className="block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors font-semibold shadow-sm md:ml-2 mt-2 md:mt-0 text-center">
+                Admin Dashboard
+              </Link>
+            )}
           </SignedIn>
         </div>
         <button
