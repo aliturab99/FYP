@@ -4,11 +4,16 @@
   "description": "Backend API for MedMagic Medical Store Application",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node init && node server.js",
+    "dev": "node init && nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["medical", "store", "api", "healthcare"],
+  "keywords": [
+    "medical",
+    "store",
+    "api",
+    "healthcare"
+  ],
   "author": "MedMagic Team",
   "license": "ISC",
   "dependencies": {
