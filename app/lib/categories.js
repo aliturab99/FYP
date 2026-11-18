@@ -1,16 +1,14 @@
 // Utility functions for category management
+import apiClient from './api';
 
 export const fetchCategories = async () => {
   try {
-    const res = await fetch('/api/categories');
-    if (res.ok) {
-      const categories = await res.json();
-      return categories.filter(cat => cat.isActive).sort((a, b) => a.order - b.order);
-    }
-    return [];
+    const categories = await apiClient.getCategories({ active: 'true' });
+    return categories.filter(cat => cat.isActive).sort((a, b) => a.order - b.order);
   } catch (error) {
     console.error('Error fetching categories:', error);
-    return [];
+    // Return default categories as fallback
+    return DEFAULT_CATEGORIES;
   }
 };
 

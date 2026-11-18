@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import NoSSR from "../../components/NoSSR";
 import { fetchCategories } from "../../lib/categories";
+import apiClient from "../../lib/api";
 
 const ProductsManagement = () => {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -20,9 +21,9 @@ const ProductsManagement = () => {
 
   // Admin email check
   const ADMIN_EMAILS = ["syedyawaraliturab@gmail.com"];
-  const isAdmin = isSignedIn && user?.emailAddresses?.[0]?.emailAddress && 
-    (ADMIN_EMAILS.includes(user.emailAddresses[0].emailAddress) || 
-     user.emailAddresses[0].emailAddress.endsWith("@medmagic.com"));
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+  const isAdmin = isSignedIn && userEmail && 
+    (ADMIN_EMAILS.includes(userEmail) || userEmail.endsWith("@medmagic.com"));
 
   useEffect(() => {
     if (isSignedIn && isAdmin) {
@@ -32,9 +33,9 @@ const ProductsManagement = () => {
 
   const loadData = async () => {
     try {
-      const [categoriesData, productsRes] = await Promise.all([
+      const [categoriesData, productsData] = await Promise.all([
         fetchCategories(),
-        fetch('/api/products')
+        apiClient.getAdminProducts(userEmail)
       ]);
       
       setCategories([
@@ -42,8 +43,9 @@ const ProductsManagement = () => {
         ...categoriesData
       ]);
       
-      const productsData = await productsRes.json();
-      setProducts(productsData);
+      // Handle both paginated and simple array responses
+      const products = productsData.products || productsData;
+      setProducts(products);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -53,9 +55,9 @@ const ProductsManagement = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products');
-      const data = await res.json();
-      setProducts(data);
+      const productsData = await apiClient.getAdminProducts(userEmail);
+      const products = productsData.products || productsData;
+      setProducts(products);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
@@ -63,31 +65,27 @@ const ProductsManagement = () => {
 
   const deleteProduct = async (id) => {
     try {
-      const res = await fetch(`/api/products/${id}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
+      const result = await apiClient.deleteProduct(id);
+      if (result.success) {
         fetchProducts();
         setDeleteConfirm(null);
       }
     } catch (error) {
       console.error('Error deleting product:', error);
+      alert('Error deleting product: ' + error.message);
     }
   };
 
   const updateProduct = async (id, updatedData) => {
     try {
-      const res = await fetch(`/api/products/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
-      });
-      if (res.ok) {
+      const result = await apiClient.updateProduct(id, updatedData);
+      if (result.success) {
         fetchProducts();
         setEditingProduct(null);
       }
     } catch (error) {
       console.error('Error updating product:', error);
+      alert('Error updating product: ' + error.message);
     }
   };
 

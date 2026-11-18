@@ -5,6 +5,7 @@ import Head from "next/head";
 import Link from "next/link";
 import NoSSR from "../../../components/NoSSR";
 import { fetchCategories } from "../../../lib/categories";
+import apiClient from "../../../lib/api";
 
 const AddProductAdmin = () => {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -46,12 +47,8 @@ const AddProductAdmin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      });
-      if (res.ok) {
+      const result = await apiClient.createProduct(form);
+      if (result.success) {
         setSuccess(true);
         setForm({ 
           name: "", 
@@ -68,6 +65,7 @@ const AddProductAdmin = () => {
       }
     } catch (error) {
       console.error('Error adding product:', error);
+      alert('Error adding product: ' + error.message);
     } finally {
       setLoading(false);
     }
